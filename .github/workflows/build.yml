@@ -1,0 +1,36 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '6.26.1'
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.13.2'
+      - name: Install dependencies
+        run: pnpm install
+      - name: build
+        run: pnpm build
+
+
+      - name: Build docs
+        run: pnpm docs:build
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs/.vitepress/dist
+          GIT_CONFIG_NAME: vue-components-lib-seed
+          COMMIT_MESSAGE: website deploy
